@@ -1,0 +1,39 @@
+{
+  "name": "koltuk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KOLTUK — berber, kuaför ve güzellik salonu randevu platformu",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/build-client.mjs --watch & tsx watch server/index.ts",
+    "build": "node scripts/build-client.mjs && tsc --noEmit -p tsconfig.json",
+    "start": "NODE_ENV=production tsx server/index.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "tsc --noEmit -p tsconfig.json && node scripts/lint.mjs",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed-demo.ts",
+    "db:reset": "tsx scripts/migrate.ts --reset && tsx scripts/seed-demo.ts",
+    "create-admin": "tsx scripts/create-admin.ts",
+    "jobs": "tsx scripts/jobs.ts",
+    "test": "node --import tsx --test --test-concurrency=1 tests/*.test.ts",
+    "test:e2e": "tsx tests/e2e/smoke.ts"
+  },
+  "dependencies": {
+    "postgres": "^3.4.5",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "^0.28.0",
+    "playwright": "^1.56.0",
+    "tsx": "^4.20.0",
+    "typescript": "^6.0.0"
+  }
+}

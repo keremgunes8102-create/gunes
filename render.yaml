@@ -1,0 +1,34 @@
+# Render Blueprint — tek tıkla kurulum: PostgreSQL + web servisi (demo modu)
+databases:
+  - name: koltuk-db
+    plan: free
+    databaseName: koltuk
+    user: koltuk
+    region: frankfurt
+
+services:
+  - type: web
+    name: koltuk
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm install --include=dev && node scripts/build-client.mjs
+    startCommand: npm run db:migrate && npm run db:seed && npm start
+    healthCheckPath: /api/meta
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: koltuk-db
+          property: connectionString
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DEMO_MODE
+        value: "1"
+      - key: ALLOW_DEMO_SEED
+        value: "1"
+      - key: DB_POOL_MAX
+        value: "5"
