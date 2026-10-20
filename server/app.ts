@@ -90,7 +90,7 @@ async function serveApp(res: ServerResponse, path: string) {
   }
   const html = indexHtml()
     .replace('<title>KOLTUK</title>', `<title>${escapeHtml(title)}</title>`)
-    .replace('__META_DESCRIPTION__', escapeHtml(description))
+    .replaceAll('__META_DESCRIPTION__', escapeHtml(description))
     .replace('__OG_TITLE__', escapeHtml(title));
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
   res.end(html);
