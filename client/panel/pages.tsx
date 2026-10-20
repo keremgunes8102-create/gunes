@@ -313,40 +313,6 @@ export function ReportsPage() {
   );
 }
 
-export function SubscriptionPage() {
-  const { bid } = usePanel();
-  useDocumentTitle('Paket ve abonelik');
-  const { data, loading, error } = useApi<{ current: { name: string; code: string; status: string; started_at: string; feature_limits: Record<string, unknown> } | null; plans: { id: string; code: string; name: string; description: string; price_amount: string; features: string[] }[]; paymentsConfigured: boolean }>(`/api/panel/${bid}/subscription`);
-  if (loading) return <Spinner />;
-  if (error || !data) return <ErrorState error={error} />;
-  return (
-    <RequireManager>
-      <div className="stack">
-        <PageHeader title="Paket ve abonelik" />
-        {!data.paymentsConfigured && <Alert tone="warning" title="Ödeme altyapısı yapılandırılmadı">Şu anda online ödeme alınamıyor; paket yükseltme talepleriniz için platform ekibiyle iletişime geçin. Hiçbir ödeme alınmış gibi gösterilmez.</Alert>}
-        <Card>
-          <div className="row-between">
-            <div><span className="muted small">Mevcut paket</span><h2 style={{ margin: 0 }}>{data.current?.name ?? 'Ücretsiz'}</h2></div>
-            <Badge tone="green">{data.current?.status === 'active' ? 'Aktif' : data.current?.status ?? 'Aktif'}</Badge>
-          </div>
-          {data.current && <p className="muted small" style={{ marginBottom: 0 }}>Başlangıç: {formatDate(data.current.started_at, undefined, { weekday: undefined })} · En fazla {String(data.current.feature_limits.max_employees)} çalışan, {String(data.current.feature_limits.max_services)} hizmet</p>}
-        </Card>
-        <div className="grid-3">
-          {data.plans.map((p) => (
-            <Card key={p.id} className="stack-sm">
-              <div className="row-between"><h3 style={{ margin: 0 }}>{p.name}</h3>{data.current?.code === p.code && <Badge tone="green">Mevcut</Badge>}</div>
-              <p className="muted small">{p.description}</p>
-              <strong>{Number(p.price_amount) > 0 ? `${formatTL(p.price_amount)} / ay` : p.code === 'free' ? formatTL(0) : 'Fiyat yakında'}</strong>
-              <ul className="small" style={{ paddingLeft: 18, margin: 0 }}>{p.features.map((f) => <li key={f}>{f}</li>)}</ul>
-              {data.current?.code !== p.code && <Button variant="secondary" size="sm" disabled title="Ödeme altyapısı bağlandığında aktifleşir">Yükselt (yakında)</Button>}
-            </Card>
-          ))}
-        </div>
-      </div>
-    </RequireManager>
-  );
-}
-
 export function TeamPage() {
   const { bid, isOwner } = usePanel();
   useDocumentTitle('Ekip ve yetkiler');

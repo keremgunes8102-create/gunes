@@ -116,8 +116,16 @@ describe('İşletme kurulumu ve yönetici onayı', () => {
     assert.ok(notifs.body.some((n: { type: string }) => n.type === 'business_approve'));
   });
 
-  test('Plan sınırı: ücretsiz pakette 3. çalışan eklenemez', async () => {
+  test('Plan sınırı: deneme bitip ücretsize düşünce 3. çalışan eklenemez', async () => {
     const { owner, bid, serviceId } = await setupApprovedBusiness(admin, { employees: 2 });
+    // Yeni işletme 30 günlük Profesyonel deneme ile başlar
+    const b1 = await owner.get(`/api/panel/${bid}/billing`);
+    assert.equal(b1.body.current.status, 'trialing');
+    assert.equal(b1.body.current.code, 'pro');
+    await sql`UPDATE subscriptions SET expires_at = now() - interval '1 minute' WHERE business_id = ${bid} AND status = 'trialing'`;
+    await runJobsOnce();
+    const b2 = await owner.get(`/api/panel/${bid}/billing`);
+    assert.equal(b2.body.current.code, 'free');
     const r = await owner.post(`/api/panel/${bid}/employees`, { display_name: 'Üçüncü', service_ids: [serviceId], hours: allDays() });
     assert.equal(r.status, 402);
   });

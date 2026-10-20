@@ -8,6 +8,7 @@ import { expireStalePending } from './booking.ts';
 import { dispatchOutbound, notify } from './notify.ts';
 import { formatDateTime } from '../shared/format.ts';
 import { anonymizeUser } from './users.ts';
+import { processSubscriptions } from './billing.ts';
 
 export async function sendReminders() {
   // Kullanıcının tercih ettiği süre kala (varsayılan 24 saat) onaylı randevular için tek seferlik hatırlatma
@@ -53,7 +54,8 @@ export async function runJobsOnce() {
     const outbound = await dispatchOutbound();
     const sessions = await sql`DELETE FROM sessions WHERE expires_at < now()`;
     const deletions = await processAccountDeletions();
-    return { expired, reminders, outbound, sessionsCleared: sessions.count, deletions };
+    const subscriptions = await processSubscriptions();
+    return { subscriptions, expired, reminders, outbound, sessionsCleared: sessions.count, deletions };
   });
 }
 

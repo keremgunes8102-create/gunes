@@ -32,3 +32,15 @@ services:
         value: "1"
       - key: DB_POOL_MAX
         value: "5"
+      # İşletmelerin paket satın alırken ulaşacağı WhatsApp (ödeme sistemi bağlanana kadar)
+      - key: SUPPORT_WHATSAPP
+        value: "905444162289"
+      # PayTR mağaza bilgileri Render panelinden girilir (gizli tutulur, burada yazılmaz)
+      - key: PAYTR_MERCHANT_ID
+        sync: false
+      - key: PAYTR_MERCHANT_KEY
+        sync: false
+      - key: PAYTR_MERCHANT_SALT
+        sync: false
+      - key: PAYTR_TEST_MODE
+        value: "1"

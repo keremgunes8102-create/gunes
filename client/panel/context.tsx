@@ -8,6 +8,7 @@ import {
   IconBell, IconCalendar, IconCard, IconChair, IconChart, IconClock, IconGrid, IconList, IconMessage, IconSettings, IconStore, IconTag, IconUser, IconUsers,
 } from '../ui/icons.tsx';
 import { MEMBER_ROLE_LABEL } from '../../shared/constants.ts';
+import { PlanBanner } from './billing.tsx';
 
 export interface PanelDetail {
   business: Record<string, any> & {
@@ -18,7 +19,7 @@ export interface PanelDetail {
   hours: { weekday: number; start: string; end: string }[];
   counts: { employees: number; services: number; stations: number; bookable_employees: number };
   membership: { role: 'owner' | 'manager' | 'staff'; employee_id: string | null; business_id: string };
-  plan: { code: string; name: string; feature_limits: Record<string, unknown> };
+  plan: { code: string; name: string; feature_limits: Record<string, unknown>; status?: string; expires_at?: string | null };
   checklist: { items: { key: string; label: string; done: boolean }[]; complete: boolean };
 }
 
@@ -121,6 +122,7 @@ export function PanelShell({ bid, children }: { bid: string; children: ReactNode
             {b.verification_status === 'pending_review' && currentSeg === '' && (
               <div style={{ marginBottom: 20 }}><Alert tone="info" title="Başvurunuz inceleniyor">Onaylandığında bildirim alacaksınız. Bu sürede hizmet, çalışan ve saatlerinizi düzenlemeye devam edebilirsiniz.</Alert></div>
             )}
+            <PlanBanner />
             {b.verification_status === 'suspended' && (
               <div style={{ marginBottom: 20 }}><Alert tone="error" title="İşletmeniz askıya alındı">{b.verification_note}</Alert></div>
             )}

@@ -5,3 +5,8 @@ process.env.UPLOAD_DIR = process.env.UPLOAD_DIR ?? `${process.cwd()}/data/test-u
 process.env.DEV_SHOW_CODES = '1';
 process.env.EMAIL_PROVIDER = '';
 process.env.SMS_PROVIDER = '';
+// PayTR test kimlik bilgileri (sahte) — gerçek PayTR'ye istek gitmez, fetch testte taklit edilir
+process.env.PAYTR_MERCHANT_ID = '123456';
+process.env.PAYTR_MERCHANT_KEY = 'testkeytestkeyAB';
+process.env.PAYTR_MERCHANT_SALT = 'testsaltSALT1234';
+process.env.PAYTR_TEST_MODE = '1';

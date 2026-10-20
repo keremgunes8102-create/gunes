@@ -537,3 +537,96 @@ table.table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 }
 .page-enter { animation: pagein 0.22s ease-out; }
 @keyframes pagein { from { opacity: 0; transform: translateY(6px); } }
+
+/* --- İşletmeler için satış sayfası --- */
+.fb-hero { padding: 40px 0 24px; }
+.fb-hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; }
+.fb-hero h1 { font-size: clamp(2.1rem, 1.3rem + 3.2vw, 3.6rem); letter-spacing: -0.035em; line-height: 1.04; margin-bottom: 18px; font-weight: 700; text-wrap: balance; }
+.fb-hero-copy { min-width: 0; }
+.fb-hero-points { list-style: none; padding: 0; margin: 20px 0 0; display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--ink-2); font-size: 0.9rem; }
+.fb-hero-points li { display: inline-flex; gap: 6px; align-items: center; }
+.fb-hero-points svg { color: var(--green); }
+@media (max-width: 960px) { .fb-hero-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+.fb-preview { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 26px; box-shadow: var(--shadow-lg); padding: 18px; min-width: 0; }
+.fb-preview-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.fb-preview-head div { display: flex; flex-direction: column; }
+.fb-preview-head span { color: var(--muted); font-size: 0.82rem; }
+.fb-live { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; color: var(--green); background: var(--green-50); padding: 5px 10px; border-radius: 999px; }
+.fb-live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+.fb-cal { display: grid; grid-template-columns: 44px repeat(3, minmax(0, 1fr)); gap: 6px; height: 300px; }
+.fb-cal-times { display: grid; grid-template-rows: 26px repeat(8, 1fr); font-size: 0.7rem; color: var(--muted-2); font-variant-numeric: tabular-nums; }
+.fb-cal-times::before { content: ''; }
+.fb-cal-col { display: grid; grid-template-rows: 26px 1fr; min-width: 0; }
+.fb-cal-name { font-size: 0.78rem; font-weight: 650; text-align: center; }
+.fb-cal-body { position: relative; background: repeating-linear-gradient(to bottom, var(--bg) 0, var(--bg) calc(12.5% - 1px), var(--line) calc(12.5% - 1px), var(--line) 12.5%); border-radius: 10px; }
+.fb-cal-appt { position: absolute; left: 3px; right: 3px; background: var(--green-50); border-left: 3px solid var(--green); border-radius: 8px; font-size: 0.72rem; font-weight: 600; padding: 4px 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-top: 2px; }
+.fb-cal-appt.pend { background: var(--amber-50); border-left-color: var(--amber); }
+.fb-toast { position: absolute; left: -16px; bottom: -18px; display: flex; gap: 10px; align-items: center; background: var(--ink); color: #fff; padding: 11px 14px; border-radius: 14px; font-size: 0.82rem; box-shadow: var(--shadow-lg); max-width: calc(100% + 16px); }
+.fb-toast svg { color: #9fd2b8; flex-shrink: 0; }
+@media (max-width: 520px) { .fb-toast { left: 8px; right: 8px; bottom: -22px; } .fb-cal { height: 250px; } }
+
+.fb-values { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding-top: 28px; }
+.fb-value { display: flex; flex-direction: column; gap: 6px; padding: 4px 4px 4px 0; }
+.fb-value-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--beige-50); border: 1px solid var(--beige); color: var(--green); display: grid; place-items: center; margin-bottom: 6px; }
+.fb-value p { color: var(--muted); font-size: 0.9rem; margin: 0; }
+@media (max-width: 900px) { .fb-values { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .fb-values { grid-template-columns: 1fr; } }
+
+.fb-split { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 40px; align-items: center; }
+@media (max-width: 900px) { .fb-split { grid-template-columns: 1fr; gap: 20px; } }
+.calc { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--card); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); }
+.calc-inputs { padding: 22px; display: flex; flex-direction: column; gap: 22px; }
+.calc-field { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: baseline; cursor: pointer; }
+.calc-field span { font-size: 0.88rem; color: var(--ink-2); }
+.calc-field strong { font-size: 1.05rem; }
+.calc-field input { grid-column: span 2; width: 100%; accent-color: var(--green); height: 28px; cursor: pointer; }
+.calc-result { background: var(--green); color: #fff; padding: 22px; display: flex; flex-direction: column; gap: 6px; }
+.calc-row { display: flex; justify-content: space-between; gap: 12px; font-size: 0.92rem; color: rgba(255,255,255,.8); padding: 4px 0; }
+.calc-row strong { color: #fff; }
+.calc-net { border-top: 1px solid rgba(255,255,255,.22); margin-top: 6px; padding-top: 12px; font-size: 1rem; }
+.calc-net strong { font-size: 1.6rem; letter-spacing: -0.02em; }
+.calc-result p { margin: auto 0 0; font-size: 0.86rem; color: rgba(255,255,255,.85); padding-top: 12px; }
+@media (max-width: 640px) { .calc { grid-template-columns: 1fr; } }
+
+.fb-pricing { background: var(--beige-50); border-block: 1px solid var(--line); }
+.fb-pricing-head { text-align: center; max-width: 620px; margin: 0 auto 24px; }
+.fb-founding { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; background: var(--ink); color: #fff; border-radius: 18px; padding: 16px 20px; margin-bottom: 20px; }
+.fb-founding div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fb-founding span { color: rgba(255,255,255,.8); font-size: 0.9rem; }
+.fb-founding b { color: #fff; }
+.fb-founding-left { background: rgba(255,255,255,.12); padding: 6px 12px; border-radius: 999px; font-weight: 650; font-size: 0.85rem; color: #fff !important; white-space: nowrap; }
+.fb-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.fb-plan { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 24px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.fb-plan.featured { border: 2px solid var(--green); box-shadow: var(--shadow-lg); }
+.fb-plan-flag { position: absolute; top: -12px; left: 22px; background: var(--green); color: #fff; font-size: 0.74rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; letter-spacing: .02em; }
+.fb-plan header h3 { font-size: 1.15rem; margin: 0 0 2px; }
+.fb-plan header p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+.fb-plan-price { display: flex; align-items: baseline; gap: 6px; }
+.fb-plan-price strong { font-size: 2.1rem; letter-spacing: -0.03em; font-weight: 700; }
+.fb-plan-price span { color: var(--muted); }
+.fb-plan-note { margin: -8px 0 0; font-size: 0.82rem; color: var(--green); font-weight: 600; }
+.fb-plan-note s { color: var(--muted); font-weight: 400; }
+.fb-plan ul { list-style: none; padding: 0; margin: 0 0 auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
+.fb-plan li { display: flex; gap: 8px; align-items: flex-start; }
+.fb-plan li svg { color: var(--green); flex-shrink: 0; margin-top: 3px; }
+.fb-plans.compact .fb-plan { padding: 20px; }
+@media (max-width: 900px) { .fb-plans { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; } .fb-plan.featured { order: -1; } }
+.fb-secure { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; color: var(--muted); font-size: 0.85rem; margin: 20px 0 0; text-align: center; }
+.fb-secure a { color: var(--green); font-weight: 600; }
+
+.fb-steps { list-style: none; padding: 0; margin: 20px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: fbstep; }
+.fb-steps li { counter-increment: fbstep; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 6px; }
+.fb-steps li::before { content: counter(fbstep); width: 32px; height: 32px; border-radius: 50%; background: var(--green-50); color: var(--green); display: grid; place-items: center; font-weight: 700; margin-bottom: 8px; }
+.fb-steps span { color: var(--muted); font-size: 0.9rem; }
+@media (max-width: 760px) { .fb-steps { grid-template-columns: 1fr; } }
+.fb-final { background: var(--green); color: #fff; border-radius: 28px; padding: clamp(28px, 5vw, 48px); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.fb-final h2 { color: #fff; margin: 0 0 4px; }
+.fb-final p { color: rgba(255,255,255,.82); margin: 0; }
+
+/* --- Panel: abonelik --- */
+.billing-current .billing-usage { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+.billing-current .billing-usage strong { font-size: 1.3rem; }
+.billing-summary { background: var(--bg); border-radius: 14px; padding: 6px 16px 14px; }
+.fb-plans.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 860px; }
+@media (max-width: 760px) { .fb-plans.compact { grid-template-columns: 1fr; } }

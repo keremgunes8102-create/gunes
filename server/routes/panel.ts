@@ -12,6 +12,7 @@ import {
 } from '../booking.ts';
 import { buildPlan, computeDaySlots, loadAvailabilityData } from '../availability.ts';
 import { audit } from '../audit.ts';
+import { startTrial } from '../billing.ts';
 import { notify } from '../notify.ts';
 import { randomToken, rateLimit, sha256 } from '../security.ts';
 import {
@@ -52,9 +53,9 @@ async function uniqueSlug(name: string, city: string | null, excludeId?: string)
 }
 
 async function planLimits(businessId: string) {
-  const [p] = await sql<{ code: string; name: string; feature_limits: Record<string, unknown> }[]>`
-    SELECT p.code, p.name, p.feature_limits FROM subscriptions s JOIN plans p ON p.id = s.plan_id
-    WHERE s.business_id = ${businessId} AND s.status IN ('active', 'trialing', 'past_due')`;
+  const [p] = await sql<{ code: string; name: string; feature_limits: Record<string, unknown>; status: string; expires_at: Date | null }[]>`
+    SELECT p.code, p.name, p.feature_limits, s.status, s.expires_at FROM subscriptions s JOIN plans p ON p.id = s.plan_id
+    WHERE s.business_id = ${businessId} AND s.status IN ('active', 'trialing', 'past_due') AND (s.expires_at IS NULL OR s.expires_at > now())`;
   return p ?? { code: 'free', name: 'Ücretsiz', feature_limits: { max_employees: 2, max_services: 15 } };
 }
 
@@ -217,8 +218,7 @@ export function registerPanelRoutes(r: Router) {
         ? body.category_ids
         : (await tx<{ id: string }[]>`SELECT id FROM categories WHERE business_type = ${body.business_type} AND is_active LIMIT 1`).map((c) => c.id);
       for (const c of catIds) await tx`INSERT INTO business_categories (business_id, category_id) VALUES (${b.id}, ${c}) ON CONFLICT DO NOTHING`;
-      const [free] = await tx<{ id: string }[]>`SELECT id FROM plans WHERE code = 'free'`;
-      if (free) await tx`INSERT INTO subscriptions (business_id, plan_id, status) VALUES (${b.id}, ${free.id}, 'active')`;
+      await startTrial(tx, b.id);
       await audit({ actor: user.id, businessId: b.id, action: 'business.create', targetType: 'business', targetId: b.id, ip: ctx.ip }, tx);
       return b;
     });
@@ -414,7 +414,7 @@ export function registerPanelRoutes(r: Router) {
     const limits = await planLimits(m.business_id);
     const [{ n }] = await sql<{ n: number }[]>`SELECT count(*)::int AS n FROM services WHERE business_id = ${m.business_id} AND is_active`;
     const max = Number(limits.feature_limits.max_services ?? 15);
-    if (n >= max) throw new HttpError(402, 'plan_limit', `${limits.name} paketinde en fazla ${max} aktif hizmet tanımlanabilir.`);
+    if (n >= max) throw new HttpError(402, 'plan_limit', `${limits.name} paketinde en fazla ${max} aktif hizmet tanımlanabilir. Daha fazlası için paketinizi yükseltin.`);
     const id = await sql.begin(async (tx) => {
       await assertOwned(tx, 'employees', body.employee_ids, m.business_id);
       await assertOwned(tx, 'stations', body.station_ids, m.business_id);
@@ -487,7 +487,7 @@ export function registerPanelRoutes(r: Router) {
     const limits = await planLimits(m.business_id);
     const [{ n }] = await sql<{ n: number }[]>`SELECT count(*)::int AS n FROM employees WHERE business_id = ${m.business_id} AND is_active`;
     const max = Number(limits.feature_limits.max_employees ?? 2);
-    if (n >= max) throw new HttpError(402, 'plan_limit', `${limits.name} paketinde en fazla ${max} aktif çalışan tanımlanabilir.`);
+    if (n >= max) throw new HttpError(402, 'plan_limit', `${limits.name} paketinde en fazla ${max} aktif çalışan tanımlanabilir. Daha fazlası için paketinizi yükseltin.`);
     const id = await sql.begin(async (tx) => {
       await assertOwned(tx, 'services', body.service_ids, m.business_id);
       const [e] = await tx<{ id: string }[]>`

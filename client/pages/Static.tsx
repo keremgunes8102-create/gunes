@@ -1,9 +1,6 @@
 import type { ReactNode } from 'react';
 import { useDocumentTitle } from '../lib/hooks.ts';
-import { useAuth } from '../lib/auth.tsx';
-import { Alert, ButtonLink, Card, EmptyState } from '../ui/index.tsx';
-import { IconCalendar, IconChart, IconCheck, IconChair, IconShield, IconUsers } from '../ui/icons.tsx';
-import { formatTL } from '../../shared/format.ts';
+import { Alert, ButtonLink, EmptyState } from '../ui/index.tsx';
 import { LEGAL_DOC_VERSION } from '../../shared/constants.ts';
 
 const LegalNotice = () => (
@@ -127,72 +124,38 @@ export function Contact() {
   );
 }
 
-export function ForBusiness() {
-  useDocumentTitle('İşletmeni ekle');
-  const { user, memberships } = useAuth();
-  const cta = user ? (memberships.length ? `/panel/${memberships[0].business_id}` : '/panel/yeni') : '/isletme-kayit';
+export function DistanceSales() {
   return (
-    <>
-      <section className="hero">
-        <div className="container hero-grid">
-          <div>
-            <span className="eyebrow"><IconChair size={15} /> İşletmeler için</span>
-            <h1>Koltukların boş kalmasın.</h1>
-            <p className="hero-lead">Online randevu, çalışan ve koltuk bazlı takvim, otomatik hatırlatmalar ve raporlar. Kurulum birkaç dakika sürer.</p>
-            <div className="row">
-              <ButtonLink to={cta} size="lg">{memberships.length ? 'İşletme paneline git' : 'Ücretsiz başla'}</ButtonLink>
-              <ButtonLink to="/isletmeni-ekle#paketler" variant="secondary" size="lg">Paketler</ButtonLink>
-            </div>
-          </div>
-          <div className="stack">
-            {[
-              [IconCalendar, 'Gerçek zamanlı müsaitlik', 'Çalışma saatleri, vardiyalar, molalar ve mevcut randevular anlık hesaplanır; aynı saate iki randevu verilemez.'],
-              [IconUsers, 'Çalışan ve istasyon yönetimi', 'Hangi çalışanın hangi hizmeti yaptığını, boya istasyonu gibi kısıtlı kaynakları ayrı ayrı tanımlayın.'],
-              [IconShield, 'Onaylı ve güvenilir', 'İşletmeler incelenerek yayına alınır; yorumlar yalnızca gerçek randevulardan gelir.'],
-              [IconChart, 'Raporlar', 'Günlük ve aylık randevu, iptal, gelmedi oranları ve tahmini hizmet tutarları.'],
-            ].map(([I, t, d]) => {
-              const Icon = I as typeof IconCalendar;
-              return (
-                <Card key={t as string}>
-                  <div className="row" style={{ alignItems: 'flex-start', flexWrap: 'nowrap' }}>
-                    <span className="empty-icon" style={{ width: 44, height: 44, margin: 0, flexShrink: 0 }}><Icon size={20} /></span>
-                    <div><strong>{t as string}</strong><p className="muted small" style={{ margin: 0 }}>{d as string}</p></div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-      <section className="section" id="paketler">
-        <div className="container">
-          <h2>Paketler</h2>
-          <p className="muted">Ödeme altyapısı henüz bağlanmadığı için tüm işletmeler şu an Ücretsiz paketle başlar. Ücretli paketler ödeme entegrasyonu tamamlandığında aktifleşecektir.</p>
-          <PlansGrid />
-        </div>
-      </section>
-    </>
+    <Legal title="Mesafeli hizmet sözleşmesi (işletme aboneliği)">
+      <p>Bu sözleşme, KOLTUK platformunda işletme hesabı açan ve ücretli pakete abone olan işletme ("Abone") ile platform işletmecisi ("Hizmet sağlayıcı") arasındadır.</p>
+      <h2>Taraflar</h2>
+      <p>Hizmet sağlayıcı: [Unvan, adres, vergi dairesi/no, MERSİS, e-posta, telefon — doldurulacak]. Abone: işletme hesabında kayıtlı işletme ve sahibi.</p>
+      <h2>Hizmetin konusu</h2>
+      <p>Online randevu, takvim, çalışan ve hizmet yönetimi yazılımına seçilen paket kapsamında süreli erişim. Hizmet tamamen elektronik ortamda sunulur; fiziksel teslimat yoktur.</p>
+      <h2>Bedel ve ödeme</h2>
+      <p>Paket bedelleri KDV dahil olarak satın alma ekranında gösterilir. Ödeme PayTR güvenli ödeme altyapısıyla kredi veya banka kartından tek seferde alınır. Kart bilgileri KOLTUK sunucularında saklanmaz. Abonelik otomatik yenilenmez; süre bitiminde işletme Ücretsiz pakete geçer.</p>
+      <h2>Platform müşterilerden ödeme almaz</h2>
+      <p>KOLTUK, randevu alan son kullanıcılardan herhangi bir ücret tahsil etmez ve işletme adına ödeme kabul etmez. Hizmet bedeli işletmede, işletme ile müşteri arasında ödenir.</p>
+      <h2>Cayma hakkı</h2>
+      <p>Abone, ticari veya mesleki amaçla hareket eden bir işletmedir. Tüketici sıfatıyla işlem yapılması halinde, elektronik ortamda anında ifasına başlanan hizmetlerde cayma hakkına ilişkin istisnalar Mesafeli Sözleşmeler Yönetmeliği çerçevesinde değerlendirilir. İade koşulları "İptal ve iade koşulları" sayfasında açıklanmıştır.</p>
+      <h2>Uyuşmazlık</h2>
+      <p>[Yetkili mahkeme ve icra daireleri — doldurulacak]</p>
+    </Legal>
   );
 }
 
-function PlansGrid() {
-  const plans = [
-    { name: 'Ücretsiz', price: 0, items: ['İşletme profili', 'Temel hizmet listesi (15 hizmete kadar)', 'Temel randevu yönetimi', '2 çalışana kadar', 'Sınırlı istatistikler'] },
-    { name: 'Profesyonel', price: null, items: ['Gelişmiş takvim', 'Ayrıntılı raporlar', '10 çalışana kadar', 'Hatırlatma özellikleri', 'Daha fazla özelleştirme'] },
-    { name: 'Premium', price: null, items: ['Gelişmiş işletme analizi', 'Birden fazla şube', 'Gelişmiş çalışan raporları', 'Öne çıkarma seçenekleri', 'Gelişmiş yönetim'] },
-  ];
+export function RefundPolicy() {
   return (
-    <div className="grid-3" style={{ marginTop: 20 }}>
-      {plans.map((p, i) => (
-        <Card key={p.name} className={i === 1 ? 'stack' : 'stack'}>
-          <h3>{p.name}</h3>
-          <div style={{ fontSize: '1.6rem', fontWeight: 700 }}>{p.price === 0 ? formatTL(0) : <span className="muted" style={{ fontSize: '1rem' }}>Fiyat yakında</span>}</div>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }} className="stack-sm">
-            {p.items.map((x) => <li key={x} className="row small" style={{ gap: 8, flexWrap: 'nowrap' }}><IconCheck size={16} style={{ color: 'var(--green)', flexShrink: 0 }} /> {x}</li>)}
-          </ul>
-        </Card>
-      ))}
-    </div>
+    <Legal title="İptal ve iade koşulları">
+      <ul>
+        <li>Yeni işletmeler 30 gün boyunca Profesyonel paketi ücretsiz dener; deneme süresi için kart bilgisi istenmez ve ücret alınmaz.</li>
+        <li>Ücretli paketler otomatik yenilenmez. Süre bitiminde hesap kendiliğinden Ücretsiz pakete geçer; işletme verileri silinmez.</li>
+        <li>Ödemeden sonraki 14 gün içinde paketi hiç kullanmadıysanız (paket özelliklerinden yararlanmadıysanız) tam iade talep edebilirsiniz.</li>
+        <li>Teknik bir arıza nedeniyle hizmet 72 saatten uzun süre kesintiye uğrarsa, kullanılamayan süre kadar ücretsiz uzatma yapılır.</li>
+        <li>Mükerrer veya hatalı çekimler tespit edildiğinde 7 iş günü içinde kartınıza iade edilir. İadeler PayTR üzerinden ödemenin yapıldığı karta yapılır; kartınıza yansıma süresi bankanıza bağlıdır.</li>
+        <li>İade ve iptal talepleriniz için: [destek e-postası / WhatsApp — doldurulacak].</li>
+      </ul>
+    </Legal>
   );
 }
 

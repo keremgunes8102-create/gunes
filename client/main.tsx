@@ -10,15 +10,17 @@ import { BusinessDetail } from './pages/BusinessDetail.tsx';
 import { Booking, BookingSuccess } from './pages/Booking.tsx';
 import { ForgotPassword, Invitation, Login, Register, ResetPassword } from './pages/Auth.tsx';
 import { AccountLayout, AppointmentDetailPage, MyAppointments, MyFavorites, MyReviews, NotificationsPage, PrivacyPage, ProfilePage } from './pages/Account.tsx';
-import { About, Contact, CookiePolicy, ForBusiness, KvkkNotice, NotFound, PrivacyPolicy, Terms } from './pages/Static.tsx';
+import { About, Contact, CookiePolicy, DistanceSales, KvkkNotice, NotFound, PrivacyPolicy, RefundPolicy, Terms } from './pages/Static.tsx';
+import { ForBusiness } from './pages/ForBusiness.tsx';
+import { BillingPage } from './panel/billing.tsx';
 import { PanelShell } from './panel/context.tsx';
 import { NewBusiness, SetupWizard } from './panel/Wizard.tsx';
 import { AppointmentsPage, CustomersPage } from './panel/appointments.tsx';
 import {
-  CalendarPage, EmployeesPage, HoursPage, Overview, ProfilePanelPage, ReportsPage, ReviewsPage, ServicesPage, SettingsPage, StationsPage, SubscriptionPage, TeamPage,
+  CalendarPage, EmployeesPage, HoursPage, Overview, ProfilePanelPage, ReportsPage, ReviewsPage, ServicesPage, SettingsPage, StationsPage, TeamPage,
 } from './panel/pages.tsx';
 import {
-  AdminAudit, AdminBusinesses, AdminCategories, AdminDashboard, AdminDataRequests, AdminMessages, AdminModeration, AdminPlans, AdminShell, AdminUsers,
+  AdminAudit, AdminPayments, AdminBusinesses, AdminCategories, AdminDashboard, AdminDataRequests, AdminMessages, AdminModeration, AdminPlans, AdminShell, AdminUsers,
 } from './admin/Admin.tsx';
 import './styles.css';
 
@@ -50,7 +52,7 @@ const PANEL: Record<string, () => ReactNode> = {
   raporlar: () => <ReportsPage />,
   bildirimler: () => <NotificationsPage />,
   ekip: () => <TeamPage />,
-  abonelik: () => <SubscriptionPage />,
+  abonelik: () => <BillingPage />,
   ayarlar: () => <SettingsPage />,
 };
 
@@ -60,6 +62,7 @@ const ADMIN: Record<string, () => ReactNode> = {
   kullanicilar: () => <AdminUsers />,
   moderasyon: () => <AdminModeration />,
   kategoriler: () => <AdminCategories />,
+  odemeler: () => <AdminPayments />,
   paketler: () => <AdminPlans />,
   kvkk: () => <AdminDataRequests />,
   mesajlar: () => <AdminMessages />,
@@ -94,6 +97,8 @@ function resolve(path: string): { node: ReactNode; footer: boolean } {
     '/kvkk': () => <KvkkNotice />,
     '/kullanim-kosullari': () => <Terms />,
     '/cerez-politikasi': () => <CookiePolicy />,
+    '/mesafeli-satis-sozlesmesi': () => <DistanceSales />,
+    '/iptal-iade': () => <RefundPolicy />,
     '/hakkimizda': () => <About />,
     '/iletisim': () => <Contact />,
     '/hesabim': () => <Redirect to="/hesabim/randevular" />,

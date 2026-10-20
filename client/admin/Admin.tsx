@@ -15,7 +15,8 @@ const NAV = [
   { to: '/yonetim/kullanicilar', label: 'Kullanıcılar', icon: IconUsers },
   { to: '/yonetim/moderasyon', label: 'Yorum ve şikâyetler', icon: IconFlag },
   { to: '/yonetim/kategoriler', label: 'Kategoriler', icon: IconTag },
-  { to: '/yonetim/paketler', label: 'Paketler', icon: IconCard },
+  { to: '/yonetim/odemeler', label: 'Ödemeler ve gelir', icon: IconCard },
+  { to: '/yonetim/paketler', label: 'Paketler', icon: IconTag },
   { to: '/yonetim/kvkk', label: 'KVKK başvuruları', icon: IconLock },
   { to: '/yonetim/mesajlar', label: 'Bildirim servisleri', icon: IconMessage },
   { to: '/yonetim/kayitlar', label: 'İşlem kayıtları', icon: IconList },
@@ -458,3 +459,39 @@ export function AdminAudit() {
   );
 }
 
+
+export function AdminPayments() {
+  useDocumentTitle('Ödemeler ve gelir');
+  const { data, loading, error, reload } = useApi<{ rows: { merchant_oid: string; months: number; amount: string; status: string; founding: boolean; provider: string; created_at: string; paid_at: string | null; failure_reason: string | null; plan_name: string; business_name: string }[]; summary: Record<string, string | number>; onlinePayments: boolean; demoPayments: boolean }>('/api/admin/payments');
+  if (loading) return <Spinner />;
+  if (error || !data) return <ErrorState error={error} onRetry={reload} />;
+  const s = data.summary;
+  return (
+    <div className="stack">
+      <PageHeader title="Ödemeler ve gelir" description="İşletmelerin PayTR ile yaptığı abonelik ödemeleri. Randevu alan kişilerden ödeme alınmaz." />
+      {!data.onlinePayments && <Alert tone="warning" title="PayTR henüz bağlı değil">Render'da PAYTR_MERCHANT_ID, PAYTR_MERCHANT_KEY ve PAYTR_MERCHANT_SALT ortam değişkenlerini girin. PayTR mağaza panelinde Bildirim URL olarak <span className="mono">/api/payments/paytr/callback</span> adresini tanımlayın.{data.demoPayments ? ' Şu an demo ödemeler açık; bunlar gerçek gelir değildir.' : ''}</Alert>}
+      <div className="stats-grid">
+        <Stat label="Aylık tekrarlayan gelir" value={formatTL(s.mrr as string)} hint="Aktif ücretli paketlerin aylık tutarı" />
+        <Stat label="Bu ay tahsil edilen" value={formatTL(s.this_month as string)} />
+        <Stat label="Toplam tahsilat" value={formatTL(s.total as string)} hint={`${s.paid_count} başarılı ödeme`} />
+        <Stat label="Ödeyen işletme" value={s.paying_businesses} />
+        <Stat label="Denemedeki işletme" value={s.trialing_businesses} />
+      </div>
+      {!data.rows.length ? <EmptyState title="Henüz ödeme yok" /> : (
+        <div className="table-wrap"><table className="table">
+          <thead><tr><th>Tarih</th><th>İşletme</th><th>Paket</th><th>Tutar</th><th>Durum</th><th>Kaynak</th></tr></thead>
+          <tbody>{data.rows.map((r) => (
+            <tr key={r.merchant_oid}>
+              <td className="small nowrap">{formatDateTime(r.created_at)}</td>
+              <td className="small">{r.business_name}</td>
+              <td className="small">{r.plan_name} · {r.months} ay{r.founding ? ' · kurucu' : ''}</td>
+              <td className="small mono">{formatTL(r.amount)}</td>
+              <td>{r.status === 'paid' ? <Badge tone="green">Ödendi</Badge> : r.status === 'pending' ? <Badge tone="amber">Bekliyor</Badge> : <Badge tone="red">Başarısız</Badge>}{r.failure_reason && r.status === 'failed' && <div className="muted xsmall">{r.failure_reason}</div>}</td>
+              <td className="small">{r.provider === 'paytr' ? 'PayTR' : r.provider === 'demo' ? 'Demo' : 'Manuel'}</td>
+            </tr>))}
+          </tbody>
+        </table></div>
+      )}
+    </div>
+  );
+}

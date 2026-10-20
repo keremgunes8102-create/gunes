@@ -187,7 +187,9 @@ export function Footer({ onCookies }: { onCookies: () => void }) {
             <h4>İşletmeler</h4>
             <ul>
               <li><Link to="/isletmeni-ekle">İşletmeni ekle</Link></li>
-              <li><Link to="/isletmeni-ekle#paketler">Paketler</Link></li>
+              <li><Link to="/isletmeni-ekle#paketler">Paketler ve fiyatlar</Link></li>
+              <li><Link to="/mesafeli-satis-sozlesmesi">Abonelik sözleşmesi</Link></li>
+              <li><Link to="/iptal-iade">İptal ve iade</Link></li>
               <li><Link to="/panel">İşletme paneli</Link></li>
             </ul>
           </div>

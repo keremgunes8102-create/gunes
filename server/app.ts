@@ -12,6 +12,7 @@ import { registerMeRoutes } from './routes/me.ts';
 import { registerPanelRoutes } from './routes/panel.ts';
 import { registerAdminRoutes } from './routes/admin.ts';
 import { registerUploadRoutes } from './routes/uploads.ts';
+import { registerBillingRoutes, PAYTR_CALLBACK_PATH } from './routes/billing.ts';
 import './validation.ts';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -24,6 +25,7 @@ registerMeRoutes(router);
 registerPanelRoutes(router);
 registerAdminRoutes(router);
 registerUploadRoutes(router);
+registerBillingRoutes(router);
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -48,7 +50,7 @@ const CSP = [
   "img-src 'self' data: blob:",
   "font-src 'self'",
   "connect-src 'self'",
-  'frame-src https://www.openstreetmap.org',
+  'frame-src https://www.openstreetmap.org https://www.paytr.com',
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -115,6 +117,8 @@ const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 function checkCsrf(ctx: Ctx) {
   if (!MUTATING.has(ctx.method)) return;
+  // PayTR sunucudan sunucuya bildirim gönderir; imza (hash) ile doğrulanır.
+  if (ctx.path === PAYTR_CALLBACK_PATH) return;
   // 1) Özel başlık: tarayıcılar çapraz siteden bu başlığı CORS ön kontrolü olmadan gönderemez.
   if (ctx.req.headers['x-koltuk-client'] !== '1') throw new HttpError(403, 'csrf', 'Geçersiz istek kaynağı.');
   // 2) Origin kontrolü (varsa)
