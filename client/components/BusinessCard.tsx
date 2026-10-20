@@ -45,7 +45,11 @@ export function BusinessCard({ b, favorite: initialFav = false }: { b: BizListIt
     <article className="biz-card">
       <div className="biz-card-media">
         <BusinessVisual name={b.name} type={b.business_type} url={b.cover_url} />
-        <div className="biz-card-badges">{b.is_demo ? <DemoBadge /> : <Badge tone="green"><IconShield size={13} /> Doğrulanmış</Badge>}</div>
+        <div className="biz-card-badges">
+          {b.is_demo ? <DemoBadge /> : <Badge tone="green"><IconShield size={13} /> Doğrulanmış</Badge>}
+          {b.placement === 'sponsored' && <span className="badge badge-ad" title="Bu işletme ücretli Vitrin paketiyle üst sırada gösteriliyor.">Sponsorlu</span>}
+          {b.placement !== 'sponsored' && (b.plan_level ?? 0) >= 3 && <span className="badge badge-ad" title="Bu işletme ücretli paketle öne çıkarılıyor.">Öne çıkan</span>}
+        </div>
         <button type="button" className={`icon-btn biz-card-fav ${fav ? 'on' : ''}`} onClick={toggleFav} aria-pressed={fav} aria-label={fav ? `${b.name} favorilerden çıkar` : `${b.name} favorilere ekle`} style={{ zIndex: 2 }}>
           {fav ? <IconHeartFilled size={18} /> : <IconHeart size={18} />}
         </button>

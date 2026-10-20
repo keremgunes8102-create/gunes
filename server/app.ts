@@ -40,6 +40,8 @@ const MIME: Record<string, string> = {
   '.json': 'application/json',
   '.txt': 'text/plain; charset=utf-8',
   '.webmanifest': 'application/manifest+json',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
   '.map': 'application/json',
 };
 
@@ -48,6 +50,7 @@ const CSP = [
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
+  "media-src 'self'",
   "font-src 'self'",
   "connect-src 'self'",
   'frame-src https://www.openstreetmap.org https://www.paytr.com',
@@ -98,17 +101,30 @@ async function serveApp(res: ServerResponse, path: string) {
   res.end(html);
 }
 
-function serveStatic(res: ServerResponse, baseDir: string, relPath: string, cache: string): boolean {
+function serveStatic(res: ServerResponse, baseDir: string, relPath: string, cache: string, range?: string): boolean {
   const file = resolve(baseDir, '.' + relPath);
   if (!file.startsWith(baseDir + sep)) return false;
   if (!existsSync(file)) return false;
   const st = statSync(file);
   if (!st.isFile()) return false;
-  res.writeHead(200, {
-    'Content-Type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream',
-    'Content-Length': st.size,
-    'Cache-Control': cache,
-  });
+  const type = MIME[extname(file).toLowerCase()] ?? 'application/octet-stream';
+  // Video oynatıcılar (özellikle iOS Safari) parça parça istek (Range) gönderir
+  const m = range?.match(/^bytes=(\d*)-(\d*)$/);
+  if (m && (m[1] || m[2])) {
+    let start = m[1] ? Number(m[1]) : st.size - Number(m[2]);
+    let end = m[1] && m[2] ? Number(m[2]) : st.size - 1;
+    if (!m[1]) end = st.size - 1;
+    start = Math.max(0, start);
+    end = Math.min(end, st.size - 1);
+    if (start > end || start >= st.size) {
+      res.writeHead(416, { 'Content-Range': `bytes */${st.size}` }).end();
+      return true;
+    }
+    res.writeHead(206, { 'Content-Type': type, 'Content-Length': end - start + 1, 'Content-Range': `bytes ${start}-${end}/${st.size}`, 'Accept-Ranges': 'bytes', 'Cache-Control': cache });
+    createReadStream(file, { start, end }).pipe(res);
+    return true;
+  }
+  res.writeHead(200, { 'Content-Type': type, 'Content-Length': st.size, 'Cache-Control': cache, 'Accept-Ranges': 'bytes' });
   createReadStream(file).pipe(res);
   return true;
 }
@@ -152,9 +168,10 @@ export async function handle(req: IncomingMessage, res: ServerResponse) {
       return;
     }
     if (path.startsWith('/assets/') && serveStatic(res, PUBLIC_DIR, path, config.isProduction ? 'public, max-age=31536000, immutable' : 'no-cache')) return;
+    if (path.startsWith('/media/') && serveStatic(res, PUBLIC_DIR, path, 'public, max-age=604800', req.headers.range)) return;
     if (path.startsWith('/uploads/') && serveStatic(res, config.uploadDir, path.slice('/uploads'.length), 'public, max-age=86400')) return;
     if (/^\/(favicon\.svg|robots\.txt|manifest\.webmanifest)$/.test(path) && serveStatic(res, PUBLIC_DIR, path, 'public, max-age=86400')) return;
-    if (path.startsWith('/assets/') || path.startsWith('/uploads/')) {
+    if (path.startsWith('/assets/') || path.startsWith('/uploads/') || path.startsWith('/media/')) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Bulunamadı');
       return;
     }

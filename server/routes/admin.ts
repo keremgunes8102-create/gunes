@@ -250,6 +250,7 @@ export function registerAdminRoutes(r: Router) {
           reminders: z.boolean(),
           multi_branch: z.boolean().optional(),
           featured: z.boolean().optional(),
+          boost: z.number().int().min(0).max(4).optional(),
         }),
         is_active: z.boolean(),
       }),

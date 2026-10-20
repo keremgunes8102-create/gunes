@@ -341,7 +341,7 @@ export function AdminPlans() {
         <Card key={p.id} className="stack-sm">
           <div className="row-between"><h3 style={{ margin: 0 }}>{p.name}</h3>{!p.is_active && <Badge>Pasif</Badge>}</div>
           <strong>{formatTL(p.price_amount)} / {p.billing_period === 'monthly' ? 'ay' : 'yıl'}</strong>
-          <span className="muted small">{p.active_subscriptions} aktif abonelik · {p.feature_limits.max_employees} çalışan · {p.feature_limits.max_services} hizmet</span>
+          <span className="muted small">{p.active_subscriptions} aktif abonelik · {p.feature_limits.max_employees} çalışan · {p.feature_limits.max_services} hizmet{p.feature_limits.boost ? ` · öne çıkma ${p.feature_limits.boost}. seviye` : ''}</span>
           <ul className="small" style={{ paddingLeft: 18, margin: 0 }}>{p.features.map((f) => <li key={f}>{f}</li>)}</ul>
           <Button size="sm" variant="secondary" onClick={() => setEdit({ ...p, featuresText: p.features.join('\n'), feature_limits: { ...p.feature_limits } })}>Düzenle</Button>
         </Card>
@@ -354,6 +354,7 @@ export function AdminPlans() {
             <TextInput label="En fazla çalışan" type="number" min={1} value={edit.feature_limits.max_employees} onChange={(e) => setEdit({ ...edit, feature_limits: { ...edit.feature_limits, max_employees: Number(e.target.value) } })} />
             <TextInput label="En fazla hizmet" type="number" min={1} value={edit.feature_limits.max_services} onChange={(e) => setEdit({ ...edit, feature_limits: { ...edit.feature_limits, max_services: Number(e.target.value) } })} />
             <Select label="Raporlar" value={edit.feature_limits.reports} onChange={(e) => setEdit({ ...edit, feature_limits: { ...edit.feature_limits, reports: e.target.value } })}><option value="basic">Temel</option><option value="detailed">Ayrıntılı</option><option value="advanced">Gelişmiş</option></Select>
+            <Select label="Aramada öne çıkma" value={String(edit.feature_limits.boost ?? 0)} onChange={(e) => setEdit({ ...edit, feature_limits: { ...edit.feature_limits, boost: Number(e.target.value) } })}><option value="0">Yok</option><option value="1">1. seviye</option><option value="2">2. seviye</option><option value="3">3. seviye · Öne çıkan rozeti, vitrin</option><option value="4">4. seviye · Sponsorlu ilk sıra</option></Select>
             <Select label="Dönem" value={edit.billing_period} onChange={(e) => setEdit({ ...edit, billing_period: e.target.value })}><option value="monthly">Aylık</option><option value="yearly">Yıllık</option></Select>
           </div>
           <TextArea label="Açıklama" value={edit.description ?? ''} onChange={(e) => setEdit({ ...edit, description: e.target.value })} rows={2} />

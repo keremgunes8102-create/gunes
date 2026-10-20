@@ -630,3 +630,60 @@ table.table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .billing-summary { background: var(--bg); border-radius: 14px; padding: 6px 16px 14px; }
 .fb-plans.compact { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 860px; }
 @media (max-width: 760px) { .fb-plans.compact { grid-template-columns: 1fr; } }
+
+/* --- Ürün videoları --- */
+.loop-video { position: relative; width: 100%; height: 100%; }
+.loop-video video { display: block; width: 100%; height: 100%; object-fit: cover; background: var(--bg); }
+.loop-video-btn { position: absolute; right: 10px; bottom: 10px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: rgba(34,37,34,.55); color: #fff; display: grid; place-items: center; cursor: pointer; opacity: .75; backdrop-filter: blur(6px); }
+.loop-video-btn:hover, .loop-video-btn:focus-visible { opacity: 1; }
+.phone-frame { position: relative; width: min(300px, 78vw); aspect-ratio: 390 / 844; max-width: 100%; border-radius: 44px; padding: 10px; background: #1b1d1b; box-shadow: 0 30px 60px rgba(34,37,34,.22), inset 0 0 0 2px #3a3d3a; }
+.phone-frame .loop-video { border-radius: 34px; overflow: hidden; }
+.phone-notch { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 84px; height: 22px; border-radius: 999px; background: #1b1d1b; z-index: 2; }
+.hero-visual-phone { display: flex; justify-content: center; padding: 10px 0 20px; }
+.hero-visual-phone .hero-back { inset: 50px 6% 0 6%; }
+.hero-visual-phone .phone-frame { z-index: 2; }
+.browser-frame { width: 100%; max-width: 100%; border-radius: 16px; overflow: hidden; background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow-lg); }
+.browser-bar { display: flex; align-items: center; gap: 6px; padding: 9px 12px; background: #efeeea; border-bottom: 1px solid var(--line); }
+.browser-bar span { width: 10px; height: 10px; border-radius: 50%; background: #d6d5cf; }
+.browser-bar em { font-style: normal; font-size: 0.72rem; color: var(--muted); background: var(--card); border-radius: 6px; padding: 3px 10px; margin-left: 10px; flex: 1; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.browser-frame .loop-video { aspect-ratio: 1280 / 723; height: auto; }
+.fb-showcase { position: relative; padding: 0 0 40px; min-width: 0; }
+.fb-showcase-phone { position: absolute; right: -18px; bottom: 0; width: 150px; }
+.fb-showcase-phone .phone-frame { width: 150px; border-radius: 26px; padding: 6px; }
+.fb-showcase-phone .phone-frame .loop-video { border-radius: 21px; }
+.fb-showcase-phone .phone-notch { width: 44px; height: 12px; top: 11px; }
+.fb-showcase-phone .loop-video-btn { width: 26px; height: 26px; right: 6px; bottom: 6px; }
+.fb-showcase .fb-toast { left: -12px; bottom: 56px; }
+@media (max-width: 960px) { .fb-showcase-phone { right: 0; width: 120px; } .fb-showcase-phone .phone-frame { width: 120px; } }
+@media (max-width: 520px) { .fb-showcase { padding-bottom: 70px; } .fb-showcase-phone { width: 100px; right: 4px; } .fb-showcase-phone .phone-frame { width: 100px; border-radius: 20px; padding: 5px; } .fb-showcase .fb-toast { left: 0; right: auto; bottom: 10px; max-width: 70%; } }
+
+/* --- Video bantları --- */
+.video-band { position: relative; overflow: hidden; min-height: clamp(380px, 52vw, 560px); display: flex; align-items: flex-end; margin: 24px 0; background: #1c1f1c; color: #fff; }
+.video-band-media { position: absolute !important; inset: 0; }
+.video-band-media video { object-fit: cover; }
+.video-band-media .loop-video-btn { z-index: 3; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 16px; }
+.video-band-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(18,22,19,.82) 0%, rgba(18,22,19,.55) 45%, rgba(18,22,19,.08) 80%), linear-gradient(0deg, rgba(18,22,19,.55) 0%, rgba(18,22,19,0) 45%); z-index: 1; pointer-events: none; }
+.video-band.center .video-band-shade { background: rgba(18,22,19,.55); }
+.video-band-content { position: relative; z-index: 2; padding-block: clamp(36px, 6vw, 72px); display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.video-band.center .video-band-content { align-items: center; text-align: center; }
+.video-band h2 { color: #fff; font-size: clamp(1.8rem, 1.2rem + 2.6vw, 3rem); letter-spacing: -0.03em; max-width: 16ch; margin: 0; text-wrap: balance; }
+.video-band p { color: rgba(255,255,255,.86); max-width: 46ch; margin: 0; font-size: 1.05rem; }
+.video-band-eyebrow { font-size: 0.78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #bfe3cf; }
+.video-band .row { margin-top: 6px; }
+.video-band-ghost { color: #fff !important; border: 1px solid rgba(255,255,255,.45); }
+.video-band-ghost:hover { background: rgba(255,255,255,.12) !important; }
+@media (max-width: 640px) { .video-band-shade { background: linear-gradient(0deg, rgba(18,22,19,.9) 0%, rgba(18,22,19,.6) 55%, rgba(18,22,19,.15) 100%); } .video-band { min-height: 520px; } }
+
+/* --- 5 paket ve reklam etiketleri --- */
+.fb-plans.five { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.fb-plans.five .fb-plan { padding: 20px 18px; border-radius: 20px; }
+.fb-plans.five .fb-plan-price strong { font-size: 1.7rem; }
+.fb-plans.five .fb-plan ul { font-size: 0.85rem; }
+@media (max-width: 1180px) { .fb-plans.five { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 900px) { .fb-plans.five { grid-template-columns: 1fr; max-width: 460px; } }
+.fb-plans.compact { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); max-width: none; }
+.fb-boost { display: flex; align-items: center; gap: 4px; font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+.fb-boost i { width: 14px; height: 6px; border-radius: 3px; background: var(--line); }
+.fb-boost i.on { background: var(--green); }
+.badge-ad { background: var(--amber-50); color: var(--amber); font-weight: 700; }
+.ad-disclosure { font-size: 0.82rem; cursor: help; text-decoration: underline dotted; }

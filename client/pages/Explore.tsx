@@ -151,7 +151,9 @@ export function Explore({ presetType }: { presetType?: BusinessType }) {
 
         <section aria-live="polite" aria-busy={loading}>
           <div className="results-head">
-            <span className="muted">{loading ? 'Aranıyor…' : data ? `${data.total} işletme bulundu` : ''}</span>
+            <span className="muted">{loading ? 'Aranıyor…' : data ? `${data.total} işletme bulundu` : ''}
+              {data?.items.some((i) => i.placement) && <span className="ad-disclosure" title="Önerilen sıralamada ücretli paket kullanan işletmeler üstte gösterilir. “Sponsorlu” ve “Öne çıkan” etiketli kartlar reklamdır."> · Sıralamaya ücretli paketler etki eder</span>}
+            </span>
             <label className="row small" style={{ gap: 8 }}>
               <span className="muted">Sırala</span>
               <select className="input select" style={{ width: 'auto', minHeight: 40, padding: '6px 36px 6px 12px' }} value={get('sort') || data?.sort || 'recommended'} onChange={(e) => {

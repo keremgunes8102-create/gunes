@@ -4,7 +4,7 @@ import { useApi, useDocumentTitle } from '../lib/hooks.ts';
 import { qs } from '../lib/api.ts';
 import { BusinessCard } from '../components/BusinessCard.tsx';
 import { SearchPanel } from '../components/SearchPanel.tsx';
-import { BusinessVisual } from '../ui/brand.tsx';
+import { PhoneFrame, VideoBand } from '../components/Media.tsx';
 import { Button, ButtonLink, Skeleton } from '../ui/index.tsx';
 import { IconCalendar, IconCheck, IconCheckCircle, IconChevronRight, IconComb, IconInfo, IconNavigation, IconScissors, IconSparkle } from '../ui/icons.tsx';
 import type { BizListItem } from '../types.ts';
@@ -13,6 +13,7 @@ interface HomeData {
   nearby: BizListItem[];
   soonest: BizListItem[];
   featured: BizListItem[];
+  showcase?: BizListItem[];
   popularServices: string[];
   realBusinessCount: number;
 }
@@ -21,49 +22,14 @@ interface Meta {
 }
 
 function HeroVisual() {
-  const days = [
-    ['Sal', '14'],
-    ['Çar', '15'],
-    ['Per', '16'],
-    ['Cum', '17'],
-    ['Cmt', '18'],
-  ];
   return (
-    <div className="hero-visual" aria-hidden>
-      <div className="hero-back" />
-      <div className="hero-card">
-        <div className="hero-card-head">
-          <BusinessVisual name="Moda" type="barber" />
-          <div>
-            <strong>Saç ve sakal</strong>
-            <div className="muted small">45 dk · Herhangi bir çalışan</div>
-          </div>
-        </div>
-        <div className="hero-days">
-          {days.map(([d, n], i) => (
-            <div key={n} className={`hero-day ${i === 1 ? 'active' : ''}`}>
-              {d}
-              <strong>{n}</strong>
-            </div>
-          ))}
-        </div>
-        <div className="hero-slots">
-          {['10:00', '10:15', '11:30', '12:00', '14:45', '15:00', '16:30', '17:15'].map((t, i) => (
-            <div key={t} className={`hero-slot ${i === 5 ? 'selected' : ''} ${i === 1 || i === 3 ? 'off' : ''}`}>
-              {t}
-            </div>
-          ))}
-        </div>
-        <div className="divider" />
-        <div className="row-between">
-          <span className="muted small">Çarşamba, 15:00</span>
-          <span className="btn btn-primary btn-sm">Randevuyu onayla</span>
-        </div>
-      </div>
-      <div className="hero-chip" style={{ left: -18, bottom: 34 }}>
+    <div className="hero-visual hero-visual-phone">
+      <div className="hero-back" aria-hidden />
+      <PhoneFrame src="/media/randevu-telefon.mp4" poster="/media/randevu-telefon.jpg" label="Telefonda KOLTUK ile randevu alma: hizmet, çalışan, tarih ve saat seçimi" />
+      <div className="hero-chip" style={{ left: -6, bottom: 70 }} aria-hidden>
         <IconCheckCircle size={18} /> Randevu onaylandı
       </div>
-      <div className="hero-chip" style={{ right: -10, top: -14 }}>
+      <div className="hero-chip" style={{ right: -4, top: 40 }} aria-hidden>
         <IconCalendar size={18} /> Gerçek zamanlı müsaitlik
       </div>
     </div>
@@ -185,6 +151,16 @@ export function Home() {
         </div>
       </section>
 
+      <VideoBand src="/media/salon-atmosfer.mp4" poster="/media/salon-atmosfer.jpg" label="Modern bir berber ve kuaför salonunda kesim ve fön">
+        <span className="video-band-eyebrow">Berber · Kuaför · Güzellik</span>
+        <h2>Şehrindeki en iyi salonlar, tek yerde.</h2>
+        <p>Fiyatları gör, yorumları oku, ustanı seç. Boş saati telefon açmadan bul.</p>
+        <div className="row">
+          <ButtonLink to="/kesfet" size="lg">Salonları keşfet</ButtonLink>
+          <ButtonLink to="/isletmeni-ekle" size="lg" variant="ghost" className="video-band-ghost">Salonun mu var?</ButtonLink>
+        </div>
+      </VideoBand>
+
       {hasDemo && (
         <div className="container" style={{ marginTop: 16 }}>
           <div className="demo-note">
@@ -223,12 +199,26 @@ export function Home() {
         </div>
       </section>
 
+      {(data?.showcase?.length ?? 0) > 0 && (
+        <section className="section" style={{ paddingTop: 0 }}>
+          <div className="container">
+            <div className="section-head">
+              <div>
+                <h2>Vitrindeki salonlar</h2>
+                <p>Öne çıkan paketini kullanan işletmeler <span className="badge badge-ad">Reklam</span></p>
+              </div>
+            </div>
+            <CardsRow items={data?.showcase} loading={false} empty="" />
+          </div>
+        </section>
+      )}
+
       {(loading || (data?.featured.length ?? 0) > 0) && (
         <section className="section" style={{ paddingTop: 0 }}>
           <div className="container">
             <div className="section-head">
               <div>
-                <h2>Öne çıkan işletmeler</h2>
+                <h2>En beğenilenler</h2>
                 <p>Gerçek randevu sonrası bırakılan değerlendirmelere göre</p>
               </div>
             </div>

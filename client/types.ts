@@ -17,6 +17,9 @@ export interface BizListItem {
   distance_km: number | null;
   sample_services: { name: string; price_type: string; price_amount: string | null; price_max_amount: string | null; duration_minutes: number }[] | null;
   next_available: { date: string; time: string; startAt: string } | null;
+  /** Ücretli yerleşim: 'sponsored' = sponsorlu ilk sıra, 'promoted' = paket nedeniyle üstte. */
+  placement?: 'sponsored' | 'promoted' | null;
+  plan_level?: number;
 }
 
 export interface SearchResult {

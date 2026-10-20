@@ -100,7 +100,7 @@ describe('Abonelik ve PayTR', () => {
     const [{ n }] = await sql<{ n: number }[]>`SELECT count(*)::int AS n FROM subscriptions WHERE business_id = ${bid} AND status = 'active'`;
     assert.equal(n, 1);
     // Artık 10'dan fazla çalışan eklenebilir (Premium limiti)
-    assert.equal(b2.body.current.feature_limits.max_employees, 100);
+    assert.equal(b2.body.current.feature_limits.max_employees, 25);
     const notifs = await owner.get('/api/me/notifications');
     assert.ok(notifs.body.some((x: { type: string }) => x.type === 'billing_paid'));
   });

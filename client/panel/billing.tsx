@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BoostMeter } from '../components/Media.tsx';
 import { Link, useSearchParams } from '../lib/router.tsx';
 import { api, ApiError } from '../lib/api.ts';
 import { useApi, useDocumentTitle } from '../lib/hooks.ts';
@@ -231,6 +232,7 @@ export function BillingPage() {
                     </p>
                   </>
                 ) : <p className="muted small">Bu süre için uygun değil.</p>}
+                <BoostMeter level={Number(p.feature_limits?.boost ?? 0)} />
                 <ul>{p.features.map((f) => <li key={f}><IconCheck size={16} /> {f}</li>)}</ul>
                 {canPayOnline && q ? (
                   <Button block variant={p.is_featured ? 'primary' : 'secondary'} onClick={() => setCheckout({ code: p.code, name: p.name, amount: q.amount })}>

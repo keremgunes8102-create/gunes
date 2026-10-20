@@ -3,51 +3,28 @@ import { Link } from '../lib/router.tsx';
 import { useApi, useDocumentTitle } from '../lib/hooks.ts';
 import { useAuth } from '../lib/auth.tsx';
 import { ButtonLink, Skeleton, cx } from '../ui/index.tsx';
+import { BoostMeter, BrowserFrame, PhoneFrame, VideoBand } from '../components/Media.tsx';
 import { IconCalendar, IconCheck, IconChart, IconShield, IconUsers, IconBell, IconTag } from '../ui/icons.tsx';
 import { formatTL } from '../../shared/format.ts';
 
 interface PlansResponse {
-  plans: { code: string; name: string; tagline: string | null; description: string | null; price_amount: string; features: string[]; is_featured: boolean }[];
+  plans: { code: string; name: string; tagline: string | null; description: string | null; price_amount: string; features: string[]; is_featured: boolean; feature_limits?: { boost?: number } }[];
   trialDays: number;
   founding: { price: number; maxMonths: number; slotsLeft: number; slots: number; planCode: string };
   onlinePayments: boolean;
 }
 
-/** Hero sağındaki örnek işletme takvimi (temsilî görsel) */
-function PanelPreview() {
-  const cols = [
-    { name: 'Mert', items: [[0, 2, 'Saç kesimi', 'ok'], [3, 5, 'Saç + sakal', 'ok'], [7, 8, 'Çocuk kesimi', 'pend']] },
-    { name: 'Can', items: [[1, 3, 'Saç kesimi', 'ok'], [5, 6, 'Sakal', 'ok'], [6, 8, 'Saç + sakal', 'ok']] },
-    { name: 'Ece', items: [[0, 4, 'Boya', 'ok'], [5, 7, 'Fön', 'pend']] },
-  ] as const;
-  const hours = ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30'];
+/** Hero sağı: gerçek işletme paneli kaydı + telefonda randevu kaydı */
+function ProductShowcase() {
   return (
-    <div className="fb-preview" aria-hidden>
-      <div className="fb-preview-head">
-        <div>
-          <strong>Bugün</strong>
-          <span>Salı, 14 randevu</span>
-        </div>
-        <span className="fb-live"><i /> Online randevu açık</span>
+    <div className="fb-showcase">
+      <BrowserFrame src="/media/isletme-paneli.mp4" poster="/media/isletme-paneli.jpg" label="İşletme paneli: genel bakış, çalışan takvimi, randevu detayı ve raporlar" />
+      <div className="fb-showcase-phone">
+        <PhoneFrame src="/media/randevu-telefon.mp4" poster="/media/randevu-telefon.jpg" label="Müşterinin telefondan randevu alması" />
       </div>
-      <div className="fb-cal">
-        <div className="fb-cal-times">{hours.map((h) => <span key={h}>{h}</span>)}</div>
-        {cols.map((c) => (
-          <div key={c.name} className="fb-cal-col">
-            <div className="fb-cal-name">{c.name}</div>
-            <div className="fb-cal-body">
-              {c.items.map(([s, e, label, st], i) => (
-                <div key={i} className={cx('fb-cal-appt', st === 'pend' && 'pend')} style={{ top: `${(s / 8) * 100}%`, height: `calc(${((e - s) / 8) * 100}% - 4px)` }}>
-                  {label}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="fb-toast">
+      <div className="fb-toast" aria-hidden>
         <IconBell size={16} />
-        <span><strong>Yeni randevu</strong> · Saç kesimi, yarın 14:30</span>
+        <span><strong>Yeni randevu</strong> · Kadın saç kesimi + fön</span>
       </div>
     </div>
   );
@@ -88,6 +65,7 @@ const FAQ: [string, string][] = [
   ['Randevulardan komisyon alıyor musunuz?', 'Hayır. Sabit aylık paket ücreti dışında hiçbir kesinti yok. Kaç randevu alırsanız alın ücret aynı.'],
   ['Müşterilerim KOLTUK’a ödeme yapıyor mu?', 'Hayır. Müşterileriniz randevuyu ücretsiz alır ve hizmet bedelini her zamanki gibi salonda size öder. Platform müşteriden para almaz.'],
   ['Deneme süresinde kart bilgisi gerekiyor mu?', 'Hayır. 30 gün boyunca Profesyonel paketi kartsız ve ücretsiz kullanırsınız.'],
+  ['Paket yükseldikçe aramada üste mi çıkıyorum?', 'Evet. “Önerilen” sıralamada üst paketteki işletmeler daha üstte gösterilir: Vitrin > Premium > Profesyonel > Başlangıç > Ücretsiz. Vitrin paketindekiler, müşteri başka bir sıralama seçse bile “Sponsorlu” etiketiyle ilk 2 yere aday olur. Ücretli yerleşimler müşteriye açıkça etiketlenir. Deneme süresi öne çıkarma sağlamaz; puanı çok düşük (3,5 altı) işletmeler öne çıkarılmaz.'],
   ['Deneme bitince ne oluyor?', 'Paket almazsanız işletmeniz Ücretsiz pakete geçer. Randevularınız, müşteri ve hizmet bilgileriniz silinmez.'],
   ['Ödeme nasıl yapılıyor?', 'İşletme panelinizden paketi ve süreyi seçip PayTR güvenli ödeme sayfasında kredi veya banka kartıyla ödersiniz. Paket anında açılır. Kart bilgileriniz bizde saklanmaz.'],
   ['Abonelik otomatik yenilenir mi?', 'Hayır. Seçtiğiniz süre bitmeden size hatırlatma gönderilir. Uzatmak isterseniz tek tıkla yenilersiniz.'],
@@ -122,7 +100,7 @@ export function ForBusiness() {
               <li><IconCheck size={16} /> Müşteriden ücret alınmaz</li>
             </ul>
           </div>
-          <PanelPreview />
+          <ProductShowcase />
         </div>
       </section>
 
@@ -146,6 +124,12 @@ export function ForBusiness() {
         </div>
       </section>
 
+      <VideoBand src="/media/salon-telefon.mp4" poster="/media/salon-telefon.jpg" label="Salon sahibi telefonundan randevu takvimine bakıyor, arkada müşteri saçına fön çekiliyor">
+        <span className="video-band-eyebrow">Salon sahipleri için</span>
+        <h2>Sen işine odaklan, randevular kendiliğinden dolsun.</h2>
+        <p>Müşterin gece yarısı bile randevu alır. Sen sabah telefonuna bakıp günün planını görürsün; ne çakışma ne kaçan arama.</p>
+      </VideoBand>
+
       <section className="section" aria-labelledby="hesap">
         <div className="container fb-split">
           <div>
@@ -160,7 +144,7 @@ export function ForBusiness() {
         <div className="container">
           <div className="fb-pricing-head">
             <h2 id="paketler-baslik">Sade fiyatlar, komisyon yok</h2>
-            <p className="muted">Fiyatlara KDV dahildir. Tüm yeni işletmeler {data?.trialDays ?? 30} gün Profesyonel paketle başlar.</p>
+            <p className="muted">Fiyatlara KDV dahildir. Tüm yeni işletmeler {data?.trialDays ?? 30} gün Profesyonel paketle başlar. Paket yükseldikçe aramalarda daha üstte çıkarsın.</p>
           </div>
           {founding && founding.slotsLeft > 0 && (
             <div className="fb-founding">
@@ -171,9 +155,9 @@ export function ForBusiness() {
               <span className="fb-founding-left">{founding.slotsLeft} yer kaldı</span>
             </div>
           )}
-          <div className="fb-plans">
+          <div className="fb-plans five">
             {loading || !data
-              ? [0, 1, 2].map((i) => <div key={i} className="fb-plan"><Skeleton h={22} w="50%" /><Skeleton h={40} w="70%" /><Skeleton h={120} /></div>)
+              ? [0, 1, 2, 3, 4].map((i) => <div key={i} className="fb-plan"><Skeleton h={22} w="50%" /><Skeleton h={40} w="70%" /><Skeleton h={120} /></div>)
               : data.plans.map((p) => {
                   const price = Number(p.price_amount);
                   return (
@@ -188,6 +172,7 @@ export function ForBusiness() {
                         <span>{price > 0 ? '/ ay' : 'her zaman'}</span>
                       </div>
                       {price > 0 && <p className="fb-plan-note">12 ay alana 2 ay hediye</p>}
+                      <BoostMeter level={Number(p.feature_limits?.boost ?? 0)} />
                       <ul>
                         {p.features.map((f) => <li key={f}><IconCheck size={16} /> {f}</li>)}
                       </ul>

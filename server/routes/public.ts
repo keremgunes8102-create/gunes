@@ -21,6 +21,7 @@ interface ListRow {
   timezone: string;
   logo_url: string | null;
   cover_url: string | null;
+  boost: number;
   is_demo: boolean;
   allow_employee_choice: boolean;
   online_booking_enabled: boolean;
@@ -65,6 +66,11 @@ function isOpenNow(hours: { weekday: number; opening_time: string; closing_time:
   const m = minutesOfDayOf(now, tz);
   return hours.some((h) => h.weekday === p.weekday && timeToMinutes(h.opening_time) <= m && m < timeToMinutes(h.closing_time));
 }
+
+const MIN_BOOST_RATING = 3.5;
+const SPONSOR_MIN_BOOST = 4;
+const SPONSOR_SLOTS = 2;
+const SPONSOR_MAX_KM = 10;
 
 const listQuery = z.object({
   type: z.enum(BUSINESS_TYPES).optional(),
@@ -115,7 +121,10 @@ export async function searchBusinesses(raw: Record<string, string>) {
            END AS distance_km,
            (SELECT json_agg(x) FROM (SELECT name, price_type, price_amount::text, price_max_amount::text, duration_minutes FROM svc
              WHERE svc.business_id = b.id ORDER BY sort_order, name LIMIT 3) x) AS sample_services,
-           (SELECT id FROM svc WHERE svc.business_id = b.id ORDER BY duration_minutes, sort_order LIMIT 1) AS reference_service_id
+           (SELECT id FROM svc WHERE svc.business_id = b.id ORDER BY duration_minutes, sort_order LIMIT 1) AS reference_service_id,
+           COALESCE((SELECT (p.feature_limits->>'boost')::int FROM subscriptions s JOIN plans p ON p.id = s.plan_id
+             WHERE s.business_id = b.id AND s.status = 'active' AND (s.expires_at IS NULL OR s.expires_at > now())
+             ORDER BY s.created_at DESC LIMIT 1), 0) AS boost
     FROM businesses b LEFT JOIN rv ON rv.business_id = b.id
     WHERE b.verification_status = 'approved' AND b.publication_status = 'published'
       AND (${q.type ?? null}::text IS NULL OR b.business_type = ${q.type ?? null})
@@ -184,6 +193,23 @@ export async function searchBusinesses(raw: Record<string, string>) {
     }
   });
 
+  // Ücretli öne çıkarma. Kalite tabanı: 5+ yorumu olup puanı 3,5 altındaki işletme öne çıkarılmaz.
+  const boostOf = (r: WithNext) => (r.is_demo || (r.review_count >= 5 && (num(r.rating) ?? 5) < MIN_BOOST_RATING) ? 0 : r.boost);
+  const marks = new Map<string, 'sponsored' | 'promoted'>();
+  if (sort === 'recommended') {
+    // Önerilen sırada paket seviyesi önce gelir (Vitrin > Premium > Profesyonel > Başlangıç > Ücretsiz), aynı seviyede kalite.
+    withNext = withNext.map((r, i) => ({ r, i })).sort((a, b) => boostOf(b.r) - boostOf(a.r) || a.i - b.i).map((x) => x.r);
+    for (const r of withNext) if (boostOf(r) > 0) marks.set(r.id, 'promoted');
+  } else {
+    // Kullanıcı başka bir sıralama seçtiyse sıra bozulmaz; yalnızca en fazla 2 Vitrin işletmesi "Sponsorlu" olarak en üste alınır.
+    const pins = withNext.filter((r) => boostOf(r) >= SPONSOR_MIN_BOOST && (sort !== 'nearest' || (r.distance_km ?? Infinity) <= SPONSOR_MAX_KM)).slice(0, SPONSOR_SLOTS);
+    if (pins.length) {
+      const ids = new Set(pins.map((p) => p.id));
+      withNext = [...pins, ...withNext.filter((r) => !ids.has(r.id))];
+      for (const p of pins) marks.set(p.id, 'sponsored');
+    }
+  }
+
   const page = q.page ?? 1;
   const total = withNext.length;
   const pageItems = withNext.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -194,8 +220,10 @@ export async function searchBusinesses(raw: Record<string, string>) {
     page,
     pageSize: PAGE_SIZE,
     sort,
-    items: pageItems.map(({ reference_service_id: _ref, timezone: _tz, ...r }) => ({
+    items: pageItems.map((full) => ({ full, level: boostOf(full) })).map(({ full: { reference_service_id: _ref, timezone: _tz, boost: _b, ...r }, level }) => ({
       ...r,
+      placement: marks.get(r.id) ?? null,
+      plan_level: level,
       distance_km: r.distance_km !== null ? Math.round(r.distance_km * 10) / 10 : null,
     })),
   };
@@ -241,6 +269,8 @@ export function registerPublicRoutes(r: Router) {
     const nearby = await searchBusinesses({ ...base, sort: lat && lng ? 'nearest' : 'recommended' });
     const soonest = await searchBusinesses({ ...base, sort: 'soonest' });
     const featured = await searchBusinesses({ ...base, sort: 'rating' });
+    // Vitrin: Premium ve Vitrin paketli işletmeler (ücretli yerleşim; arayüzde "Öne çıkan" olarak etiketlenir)
+    const showcaseAll = await searchBusinesses({ ...base, sort: 'recommended' });
     const popular = await sql<{ name: string; n: number }[]>`
       SELECT s.name_snapshot AS name, count(*)::int AS n FROM appointment_services s
       JOIN appointments a ON a.id = s.appointment_id JOIN businesses b ON b.id = a.business_id
@@ -252,6 +282,7 @@ export function registerPublicRoutes(r: Router) {
       nearby: nearby.items.slice(0, 6),
       soonest: soonest.items.filter((i) => i.next_available).slice(0, 6),
       featured: featured.items.filter((i) => i.review_count > 0).slice(0, 6),
+      showcase: showcaseAll.items.filter((i) => i.plan_level >= 3).slice(0, 6),
       popularServices: popular.map((p) => p.name),
       realBusinessCount: stats.businesses,
     };
